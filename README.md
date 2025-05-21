@@ -42,9 +42,14 @@ Expense-Tracker/
 │   ├── app.py                  # Main application file
 │   ├── models.py               # Database models
 │   └── routes/                 # API endpoints
-│       ├── auth.py             # Authentication routes
-│       └── expenses.py         # Expense management routes
+│   ├   ├── auth.py             # Authentication routes
+│   ├   └── expenses.py         # Expense management routes
+│   ├──controllers/
+
+
+
 └── README.md                   # Project documentation
+
 ```
 
 ## Technology Stack
