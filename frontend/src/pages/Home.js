@@ -1,8 +1,11 @@
-import { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
+import { useState, useEffect, useContext } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import useAuthFetch from "../hooks/useAuthFetch";
+import { AuthContext } from "../context/AuthContext";
 
 function Home() {
+  const navigate = useNavigate();
+  const { setIsAuthenticated } = useContext(AuthContext);
   const [userName, setUserName] = useState("");
   const {
     data: expenses,
@@ -19,22 +22,38 @@ function Home() {
     const fetchUserData = async () => {
       try {
         const token = localStorage.getItem("token");
+        if (!token) {
+          setIsAuthenticated(false);
+          navigate("/login");
+          return;
+        }
+
         const response = await fetch("http://localhost:5000/api/expenses", {
           headers: {
             Authorization: `Bearer ${token}`,
             "Content-Type": "application/json",
           },
         });
-        if (response.ok) {
-          const userData = await response.json();
-          setUserName(userData.name);
+
+        if (!response.ok) {
+          if (response.status === 401) {
+            // Token is invalid or expired
+            localStorage.removeItem("token");
+            setIsAuthenticated(false);
+            navigate("/login");
+            return;
+          }
+          throw new Error(`Error: ${response.status}`);
         }
+
+        const userData = await response.json();
+        setUserName(userData.name);
       } catch (error) {
         console.error("Error fetching user data:", error);
       }
     };
     fetchUserData();
-  }, []);
+  }, [navigate, setIsAuthenticated]);
 
   // Calculate totals when expenses data changes
   useEffect(() => {
@@ -52,18 +71,38 @@ function Home() {
           expenseTotal += parseFloat(item.amount || 0);
         }
 
+        // Parse the date - handle different date formats
+        let transactionDate;
+        if (item.created_on) {
+          // Try to parse the date from the created_on field
+          transactionDate = new Date(item.created_on);
+          // If the date is invalid, try different format or set to current date
+          if (isNaN(transactionDate.getTime())) {
+            // Try DD/MM/YYYY format
+            const parts = item.created_on.split("/");
+            if (parts.length === 3) {
+              transactionDate = new Date(parts[2], parts[1] - 1, parts[0]);
+            } else {
+              transactionDate = new Date(); // Fallback to current date
+            }
+          }
+        } else {
+          transactionDate = new Date(); // Default to current date if no date provided
+        }
+
         transactionList.push({
           id: item._id || item.id,
-          name:
-            item.description || item.name || item.expense_name || "Untitled",
+          name: item.description || item.name || item.expense_name || "Untitled",
           amount: item.amount || 0,
           type: item.type || "expense",
           category: item.category || "Other",
-          date: item.created_on
-            ? new Date(item.created_on).toLocaleDateString()
-            : new Date().toLocaleDateString(),
+          rawDate: transactionDate, // Store raw date for sorting
+          date: transactionDate.toLocaleDateString(),
         });
       });
+
+      // Sort transactions by date (most recent first)
+      transactionList.sort((a, b) => b.rawDate - a.rawDate);
 
       setTotalIncome(incomeTotal.toFixed(2));
       setTotalExpense(expenseTotal.toFixed(2));

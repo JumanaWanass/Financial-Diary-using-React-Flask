@@ -64,6 +64,7 @@ Expense-Tracker/
 - **Flask-JWT-Extended**: JWT authentication
 - **Flask-CORS**: Cross-origin resource sharing
 - **SQLite/PostgreSQL**: Database for data storage
+- **Redis**: In-memory data caching for improved performance
 
 ## Screenshots
 
@@ -144,6 +145,40 @@ python app.py
 - `POST /api/expenses`: Create a new expense
 - `PUT /api/expenses/:id`: Update an existing expense
 - `DELETE /api/expenses/:id`: Delete an expense
+
+## Redis Caching
+
+This application uses Redis for caching frequently accessed data to improve performance:
+
+### Cached Resources:
+
+- User expenses (cached for 5 minutes)
+
+### Cache Invalidation:
+
+- Cache is automatically invalidated when expenses are added, updated, or deleted
+
+### Benefits:
+
+- Reduced database load
+- Faster API responses
+- Improved user experience
+
+### Setup Redis:
+
+```bash
+# Install Redis server
+# On Ubuntu/Debian:
+sudo apt-get install redis-server
+
+# On macOS with Homebrew:
+brew install redis
+
+# On Windows, download the Windows port from https://github.com/microsoftarchive/redis/releases
+
+# Start Redis server
+redis-server
+```
 
 ## Future Enhancements
 

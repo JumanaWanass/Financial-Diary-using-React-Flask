@@ -6,62 +6,45 @@ export const AuthProvider = ({ children }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
 
-  // Check for token on initial load and when token changes
+  // Check for token on initial load
   useEffect(() => {
-    const checkAuthStatus = async () => {
+    const checkAuth = () => {
       const token = localStorage.getItem("token");
+      if (token) {
+        // Instead of blindly accepting the token, validate its format
+        // JWT tokens are in the format xxxxx.yyyyy.zzzzz
+        const isValidTokenFormat = token.split(".").length === 3;
 
-      if (!token) {
-        setIsAuthenticated(false);
-        setIsLoading(false);
-        return;
-      }
-
-      try {
-        // Validate the token with your backend
-        const response = await fetch(
-          "http://localhost:5000/api/validate-token",
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
-
-        if (response.ok) {
+        if (isValidTokenFormat) {
           setIsAuthenticated(true);
         } else {
-          // If token validation fails, clear the invalid token
+          // Token doesn't have valid format
           localStorage.removeItem("token");
           setIsAuthenticated(false);
         }
-      } catch (error) {
-        console.error("Error validating token:", error);
-        // On network error, assume token is valid to allow offline usage
-        setIsAuthenticated(true);
-      } finally {
-        setIsLoading(false);
+      } else {
+        setIsAuthenticated(false);
       }
+      setIsLoading(false);
     };
 
-    checkAuthStatus();
+    checkAuth();
   }, []);
 
-  // If your backend doesn't have a token validation endpoint,
-  // you can use this simpler version instead:
-  /*
-  useEffect(() => {
-    const token = localStorage.getItem("token");
-    if (token) {
-      setIsAuthenticated(true);
-    }
-    setIsLoading(false);
-  }, []);
-  */
+  // Add a method to handle logout
+  const logout = () => {
+    localStorage.removeItem("token");
+    setIsAuthenticated(false);
+  };
 
   return (
     <AuthContext.Provider
-      value={{ isAuthenticated, setIsAuthenticated, isLoading }}
+      value={{
+        isAuthenticated,
+        setIsAuthenticated,
+        isLoading,
+        logout,
+      }}
     >
       {children}
     </AuthContext.Provider>

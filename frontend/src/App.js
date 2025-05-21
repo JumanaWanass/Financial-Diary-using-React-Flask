@@ -8,6 +8,7 @@ import AddExpense from "./pages/AddExpense";
 import { ProtectedRoute } from "./components/ProtectedRoute";
 import MyAccount from "./pages/MyAccount";
 import AllExpenses from "./pages/AllExpenses"; // Import the new component
+import MyIncome from "./pages/MyIncome";
 
 function App() {
   return (
@@ -48,6 +49,14 @@ function App() {
               element={
                 <ProtectedRoute>
                   <MyAccount />
+                </ProtectedRoute>
+              }
+            ></Route>
+            <Route
+              path="/myincome"
+              element={
+                <ProtectedRoute>
+                  <MyIncome />
                 </ProtectedRoute>
               }
             ></Route>

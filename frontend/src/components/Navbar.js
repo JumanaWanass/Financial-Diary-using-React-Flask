@@ -26,9 +26,9 @@ function Navbar() {
             Add Expense
           </Link>
           <Link
-            to="/add-income"
+            to="/myincome"
             className={`nav-link ${
-              location.pathname === "/add-income" ? "active" : ""
+              location.pathname === "/myincome" ? "active" : ""
             }`}
           >
             Add Income

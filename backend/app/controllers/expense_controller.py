@@ -8,7 +8,7 @@ class ExpenseController:
     def get_user_expenses(user_id):
         expenses = ExpenseService.get_user_expenses(user_id)
         if not expenses:
-            return jsonify({"message": "No expenses found for this user"})
+            return {"message": "No expenses found for this user"}
 
         return jsonify([expense.to_dict() for expense in expenses])
 
