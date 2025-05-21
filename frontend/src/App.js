@@ -2,11 +2,12 @@ import Login from "./pages/Login";
 import { BrowserRouter, Routes, Route } from "react-router";
 import Register from "./pages/Register";
 import Home from "./pages/Home";
-import { Navbar } from "./components/Navbar";
+import Navbar from "./components/Navbar";
 import { AuthProvider } from "./context/AuthContext";
 import AddExpense from "./pages/AddExpense";
 import { ProtectedRoute } from "./components/ProtectedRoute";
 import MyAccount from "./pages/MyAccount";
+import AllExpenses from "./pages/AllExpenses"; // Import the new component
 
 function App() {
   return (
@@ -31,6 +32,14 @@ function App() {
               element={
                 <ProtectedRoute>
                   <AddExpense />
+                </ProtectedRoute>
+              }
+            ></Route>
+            <Route
+              path="/all-transactions"
+              element={
+                <ProtectedRoute>
+                  <AllExpenses />
                 </ProtectedRoute>
               }
             ></Route>

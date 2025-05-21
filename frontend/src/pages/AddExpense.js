@@ -9,10 +9,13 @@ const AddExpense = () => {
   const [created_on, setCreatedOn] = useState("");
   const [amount, setAmount] = useState("");
   const { setIsAuthenticated } = useContext(AuthContext);
+
   const handleSubmit = async (e) => {
+    e.preventDefault(); // Prevent default form submission
     const token = localStorage.getItem("token");
+
     try {
-      const response = fetch("http://localhost:5000/api/expenses", {
+      const response = await fetch("http://localhost:5000/api/expenses", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -20,19 +23,37 @@ const AddExpense = () => {
         },
         body: JSON.stringify({ expense_name, category, amount, created_on }),
       });
+
       if (!response.ok) {
         const errorData = await response.json();
-        throw new Error(errorData.error || "Failed to add task");
+        throw new Error(errorData.error || "Failed to add expense");
       }
+
+      alert("Expense added successfully");
+      setExpenseName("");
+      setCategory("");
+      setCreatedOn("");
+      setAmount("");
+
+      navigate("/");
     } catch (error) {
-      alert("Invalid credentials");
+      console.error("Error adding expense:", error);
+
+      alert(`Error: ${error.message}`);
+
+      if (
+        error.message.includes("unauthorized") ||
+        error.message.includes("token")
+      ) {
+        setIsAuthenticated(false);
+      }
     }
   };
 
   return (
     <div className="container">
       <div className="wrapper">
-        <h2 className="title_para">Track Your Expenses</h2>
+        <h2 className="title_para">You're poor. Stop spending.</h2>
 
         <form onSubmit={handleSubmit} className="expense-form">
           <div className="form-group expense-name with-icon">
@@ -57,14 +78,15 @@ const AddExpense = () => {
               onChange={(e) => setCategory(e.target.value)}
             >
               <option value="">Select a category</option>
+              <option value="coffee">☕ Coffee Addiction</option>
               <option value="food">🍔 Food & Dining</option>
+              <option value="hania">👩🏻 Hania</option>
               <option value="transport">🚗 Transportation</option>
               <option value="entertainment">🎬 Entertainment</option>
               <option value="shopping">🛍️ Shopping</option>
-              <option value="utilities">⚡ Utilities</option>
+              <option value="coworkingspace">⚡ Coworking Space</option>
               <option value="healthcare">🏥 Healthcare</option>
               <option value="education">📚 Education</option>
-              <option value="travel">✈️ Travel</option>
               <option value="other">📦 Other</option>
             </select>
           </div>

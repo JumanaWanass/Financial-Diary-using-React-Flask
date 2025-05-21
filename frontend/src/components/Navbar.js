@@ -1,21 +1,42 @@
-import "./Navbar.css";
-import { Link, NavLink } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 
-export const Navbar = () => {
+function Navbar() {
+  const location = useLocation();
+
   return (
-    <nav>
-      <Link to="/" className="title">
-        Where's My Money
-      </Link>
+    <nav className="navbar">
+      <div className="container navbar-container">
+        <Link to="/" className="logo">
+          <span>Where's My Money</span>
+        </Link>
 
-      <ul className="">
-        <li>
-          <NavLink to="/MYaccount">My Account</NavLink>
-        </li>
-        <li>
-          <NavLink to="/addexpense">Add Expense</NavLink>
-        </li>
-      </ul>
+        <div className="nav-links">
+          <Link
+            to="/"
+            className={`nav-link ${location.pathname === "/" ? "active" : ""}`}
+          >
+            Home
+          </Link>
+          <Link
+            to="/addexpense"
+            className={`nav-link ${
+              location.pathname === "/addexpense" ? "active" : ""
+            }`}
+          >
+            Add Expense
+          </Link>
+          <Link
+            to="/add-income"
+            className={`nav-link ${
+              location.pathname === "/add-income" ? "active" : ""
+            }`}
+          >
+            Add Income
+          </Link>
+        </div>
+      </div>
     </nav>
   );
-};
+}
+
+export default Navbar;
